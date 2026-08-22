@@ -12,6 +12,8 @@
       "invariants": [
         "Identical source pixels and validated options yield identical result pixels.",
         "Transparent areas remain transparent and configured palette ceilings remain bounded.",
+        "Applying a mask changes only output alpha and never rewrites source RGB channels.",
+        "Locked palettes bound every processed material region to the selected asset family colors.",
         "Every artifact and manifest identifies the result as a reference underpainting."
       ],
       "scenarios": [
@@ -36,6 +38,28 @@
             "risk": "routine",
             "side_effects": "local_files"
           }
+        },
+        {
+          "id": "cutouts-remain-bounded",
+          "title": "Cutout operations preserve the subject and remain local",
+          "oracle": "Connected-background clearing is bounded by color tolerance, hard brush edits affect only mask alpha, imported masks resample deterministically, and transparent trimming preserves requested padding.",
+          "verification_level": "automated",
+          "edge_profile": {
+            "categories": ["input_and_encoding", "state_and_sequence"],
+            "risk": "routine",
+            "side_effects": "none"
+          }
+        },
+        {
+          "id": "canonical-scales-are-exact",
+          "title": "Canonical sprite exports use exact integer scaling",
+          "oracle": "The resize command emits a 1x canonical PNG, requested 2x through 16x nearest-neighbor PNGs with exact integer dimensions, and a replayable asset manifest.",
+          "verification_level": "automated",
+          "edge_profile": {
+            "categories": ["environment_and_cross_surface"],
+            "risk": "routine",
+            "side_effects": "local_files"
+          }
         }
       ]
     },
@@ -52,7 +76,8 @@
       ],
       "invariants": [
         "The application has no source-image upload endpoint or remote processing dependency.",
-        "Material regions, diagnostics, palette counts, and exports remain keyboard reachable.",
+        "Cutout tools, material regions, diagnostics, palette counts, and exports remain keyboard reachable.",
+        "The browser exports one canonical sprite and exact integer display scales rather than inventing responsive detail.",
         "The UI never presents an automated result as finished pixel art."
       ],
       "scenarios": [
@@ -66,6 +91,17 @@
               "environment_and_cross_surface",
               "input_and_encoding"
             ],
+            "risk": "routine",
+            "side_effects": "none"
+          }
+        },
+        {
+          "id": "local-cutout-is-reversible",
+          "title": "A local background cutout is visible and reversible",
+          "oracle": "After selecting a connected background, the workbench renders the transparent cutout, exposes bounded undo and redo, and keeps canonical scale exports available without any network request.",
+          "verification_level": "direct_surface",
+          "edge_profile": {
+            "categories": ["state_and_sequence", "interruption_and_recovery"],
             "risk": "routine",
             "side_effects": "none"
           }

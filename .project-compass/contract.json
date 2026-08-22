@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 2,
+  "revision": 3,
   "project": {
     "name": "Pixel Art Workbench",
-    "identity": "A local-first, region-aware pixel-art underpainting workbench and CLI.",
+    "identity": "A local-first pixel asset workbench for cutout, palette-controlled underpainting, and canonical integer scaling.",
     "audience": "Artists and developers converting visual references into controlled inputs for authored pixel work.",
-    "core_loop": "Import a reference, set structure and material budgets, inspect deterministic diagnostics, export a replayable bundle, and finish in Aseprite.",
+    "core_loop": "Import a reference, create or import its alpha cutout, apply asset-family palette and material budgets, inspect deterministic diagnostics, export a replayable bundle, finish one canonical sprite in Aseprite, and derive exact integer display scales.",
     "north_star": "Automated preparation saves repair time while the final pixels remain visibly authored.",
     "not_this": [
       "A one-click finished-art generator",
@@ -31,7 +31,7 @@
   },
   "targets": {
     "mvp": {
-      "definition": "A tested browser workbench and CLI sharing one deterministic core, with region control, diagnostics, replayable exports, and Aseprite handoff."
+      "definition": "A tested browser workbench and CLI sharing one deterministic core, with reversible cutouts, palette locking, region control, diagnostics, replayable exports, canonical scaling, and Aseprite handoff."
     },
     "complete_product": {
       "definition": "The MVP validated across several real art cleanup sessions, with any recurring manual work promoted into bounded tools."
@@ -46,30 +46,35 @@
           "id": "replayable-underpainting",
           "name": "A source and recipe produce an inspectable, replayable underpainting bundle.",
           "targets": ["mvp", "complete_product"],
-          "maturity": 75,
+          "maturity": 88,
           "confidence": "high",
           "layers": {
             "intended": "The user requested a standalone tool that provides value beyond one website.",
             "planned": "PRODUCT.md and docs/PRD.md define the underpainting boundary and acceptance criteria.",
-            "implemented": "Shared processing core, browser worker, CLI exports, and Aseprite handoff are present.",
-            "verified": "Formatting, typecheck, lint, unit coverage, dead-code analysis, production build, external-Chrome desktop/mobile interaction, CLI export, and installed-Aseprite layer handoff pass. Repeated real cleanup sessions remain future complete-product evidence."
+            "implemented": "Shared processing core, reversible local alpha-mask workflow, asset profiles, locked palettes, browser worker, canonical scale exports, CLI resize command, and Aseprite handoff are present.",
+            "verified": "Formatting, typecheck, lint, 14 unit and CLI tests with 92.63 percent statement coverage, dead-code analysis, production build, external-Chrome desktop/mobile cutout and export interaction, CLI resize output, and installed-Aseprite handoff reopening pass. Repeated real cleanup sessions remain future complete-product evidence."
           },
           "evidence": [
             { "ref": "PRODUCT.md", "observed_at": "2026-08-22T00:00:00Z" },
             {
               "ref": "pnpm test:coverage",
-              "note": "7 tests passed; 94.69 percent statements and 97.26 percent lines",
-              "observed_at": "2026-08-22T20:01:38Z"
+              "note": "14 tests passed; 92.63 percent statements and 94.30 percent lines across masking, palettes, processing, scaling, and CLI behavior",
+              "observed_at": "2026-08-22T22:16:06Z"
             },
             {
               "ref": "pnpm test:e2e",
-              "note": "External Chrome desktop and mobile workbench acceptance passed",
-              "observed_at": "2026-08-22T20:01:38Z"
+              "note": "External Chrome desktop and mobile cutout, undo, diagnostics, and canonical-export acceptance passed",
+              "observed_at": "2026-08-22T22:17:35Z"
             },
             {
               "ref": "Aseprite 1.3.18.2 batch smoke",
-              "note": "Generated project reopened with underpainting and two diagnostic layers",
-              "observed_at": "2026-08-22T20:01:38Z"
+              "note": "Generated project reopened successfully after conversion and exact 1x, 2x, and 4x scale export",
+              "observed_at": "2026-08-22T22:03:00Z"
+            },
+            {
+              "ref": "pixel-workbench resize smoke",
+              "note": "Canonical 1x, 3x, and 6x nearest-neighbor assets and asset manifest were emitted",
+              "observed_at": "2026-08-22T22:03:00Z"
             }
           ],
           "blockers": [
@@ -86,7 +91,7 @@
     "intended": [
       {
         "ref": "current-user-request",
-        "note": "Build the workflow tools as a separate reusable repository.",
+        "note": "Expand the workbench into an easier image-to-asset pipeline with reusable pixel resizing before beginning image handoffs.",
         "observed_at": "2026-08-22T00:00:00Z"
       }
     ],
@@ -97,11 +102,11 @@
     "verified": [
       {
         "ref": "full local validation gate",
-        "note": "Format, types, lint, coverage, dead code, build, external Chrome, CLI, and Aseprite handoff passed",
-        "observed_at": "2026-08-22T20:01:38Z"
+        "note": "Format, types, lint, 14-test coverage, dead code, build, external Chrome cutout and export flow, CLI conversion and resize, and Aseprite handoff passed",
+        "observed_at": "2026-08-22T22:17:35Z"
       }
     ]
   },
   "drift": [],
-  "updated_at": "2026-08-22T20:01:38Z"
+  "updated_at": "2026-08-22T22:17:35Z"
 }

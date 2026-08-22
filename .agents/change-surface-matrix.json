@@ -21,7 +21,7 @@
       "scope": "local",
       "path": "src/core, tests/process.test.ts, docs/ARCHITECTURE.md, and docs/PRD.md",
       "owner": "repository-owner",
-      "condition": "Resizing, palette, dithering, edge, region, transparency, cleanup, metrics, or recipe semantics change.",
+      "condition": "Masking, trimming, canonical scaling, resizing, palette locking, dithering, edge, region, transparency, cleanup, metrics, or recipe semantics change.",
       "operations": ["add", "change", "remove"],
       "validation": [
         "pnpm test:coverage",
@@ -35,7 +35,7 @@
       "scope": "local",
       "path": "src/App.tsx, src/workbench, src/styles.css, and e2e",
       "owner": "repository-owner",
-      "condition": "Import, preview, tracing, diagnostics, export, accessibility, responsive, or local-processing behavior changes.",
+      "condition": "Import, cutout, mask history, palette locking, preview, tracing, diagnostics, canonical export, accessibility, responsive, or local-processing behavior changes.",
       "operations": ["add", "change", "remove"],
       "validation": [
         "pnpm lint",
@@ -50,7 +50,7 @@
       "scope": "cross-surface",
       "path": "src/cli, package.json, README.md, and tests/cli.test.ts",
       "owner": "repository-owner",
-      "condition": "CLI flags, artifact names, manifest, palette file, Aseprite discovery, or layer handoff changes.",
+      "condition": "CLI flags, mask or palette inputs, canonical resize behavior, artifact names, manifest, palette file, Aseprite discovery, or layer handoff changes.",
       "operations": ["add", "change", "remove"],
       "validation": [
         "pnpm test",
