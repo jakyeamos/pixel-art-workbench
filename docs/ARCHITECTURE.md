@@ -10,7 +10,7 @@
 
 ## CLI
 
-`src/cli/index.ts` uses Sharp only for decoding and encoding. Conversion calls the same mask, trim, palette, and processing core used by the browser. The separate `resize` command never runs the underpainting algorithm; it treats its input as the canonical pixel grid and uses nearest-neighbor scaling only. JSON manifests include a SHA-256 source digest so outputs can be matched to their source without embedding it.
+`src/cli/index.ts` uses Sharp only for decoding and encoding. Conversion calls the same mask, trim, palette, and processing core used by the browser. The separate `resize` command never runs the underpainting algorithm; it treats its input as the canonical pixel grid and calls the core's raw RGBA replication scaler so partial-alpha pixels cannot be rounded by an image-library resize path. JSON manifests include a SHA-256 source digest so outputs can be matched to their source without embedding it.
 
 ## Aseprite handoff
 
@@ -27,7 +27,7 @@
 7. Quantize with edge-guarded error diffusion.
 8. Replace sub-threshold connected clusters unless protected by edge strength.
 9. Generate diagnostics and color counts.
-10. Trim and pad the canonical underpainting, then create only requested integer nearest-neighbor display scales.
+10. Trim and pad the canonical underpainting, then create only requested integer display scales by exact raw RGBA pixel replication.
 
 This order is part of the replay contract. Algorithm changes require a schema or generator-version review because old recipes may produce different pixels.
 

@@ -55,6 +55,7 @@
       "validation": [
         "pnpm test",
         "pnpm build",
+        "semi-transparent RGBA scale-replication regression",
         "CLI smoke bundle",
         "Aseprite batch-mode smoke when installed"
       ],

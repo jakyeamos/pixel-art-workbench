@@ -56,7 +56,7 @@ After the human cleanup pass, derive lossless display scales from one canonical 
 pnpm cli -- resize cat-authored.png --trim --padding 1 --scales 1,2,3,4,6 --out cat-scales
 ```
 
-The resizer uses nearest-neighbor interpolation only. Use one canonical PNG plus CSS `image-rendering: pixelated` when the browser can scale it directly. A smaller or larger _logical detail budget_ is a retargeting task and still needs authored pixel decisions.
+The resizer replicates the canonical raw RGBA pixels exactly, including partially transparent edge pixels; it does not route scaling through an image-library interpolation path. Use one canonical PNG plus CSS `image-rendering: pixelated` when the browser can scale it directly. A smaller or larger _logical detail budget_ is a retargeting task and still needs authored pixel decisions.
 
 The CLI looks for `ASEPRITE_BIN`, an `aseprite` executable on `PATH`, then `/Applications/Aseprite.app/Contents/MacOS/aseprite`. The `.aseprite` output contains the underpainting plus hidden protected-edge and cluster-cleanup diagnostic layers.
 

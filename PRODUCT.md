@@ -21,7 +21,7 @@ Import a reference, remove or mask its background, choose an asset profile, cons
 - A locked palette can keep a family of independently processed assets visually coherent.
 - Diagnostics reveal protected edges and automated cluster changes.
 - Every export records that it is a reference underpainting, not finished art.
-- Integer nearest-neighbor exports preserve every canonical pixel and explicitly do not claim to create new detail.
+- Integer nearest-neighbor exports preserve every canonical RGBA value, including partial alpha, and explicitly do not claim to create new detail.
 - Aseprite integration uses files and its documented command surface rather than automating its visible UI.
 
 ## Non-goals
