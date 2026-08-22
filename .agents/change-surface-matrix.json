@@ -73,8 +73,22 @@
       "status": "applicable"
     }
   ],
-  "unresolved_surfaces": [
-    "A live Pronto route check at 2026-08-22T20:06:41Z confirmed this repository is not registered; repository-catalog, Quality Runner import, and showcase projections remain unverified until registration and refresh complete.",
-    "GitHub branch and metadata readback remain required after the first push before publication is considered verified."
-  ]
+  "unresolved_surfaces": [],
+  "onboarding_evidence": {
+    "pronto": {
+      "status": "registered",
+      "observed_at": "2026-08-22T20:22:08Z",
+      "repository_id": "repository:/Users/jakyeamos/projects/pixel-art-workbench",
+      "target_branch": "dev",
+      "route_status": "Ready"
+    },
+    "github": {
+      "status": "published",
+      "observed_at": "2026-08-22",
+      "url": "https://github.com/jakyeamos/pixel-art-workbench",
+      "visibility": "public",
+      "license": "MIT",
+      "default_branch": "dev"
+    }
+  }
 }
