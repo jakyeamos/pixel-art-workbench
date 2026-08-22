@@ -74,8 +74,7 @@
     }
   ],
   "unresolved_surfaces": [
-    "No Git remote is configured, so remote hosting, push verification, and publication are unavailable until the repository owner selects a host and grants publication authority.",
-    "A live Pronto route check at 2026-08-22T20:06:41Z confirmed this repository is not registered; adding a discovery root is an owner-authorized persistent configuration change, so repository-catalog, Quality Runner import, and showcase projections remain unverified rather than inferred.",
-    "Licensing is intentionally undecided and must be selected before public distribution."
+    "A live Pronto route check at 2026-08-22T20:06:41Z confirmed this repository is not registered; repository-catalog, Quality Runner import, and showcase projections remain unverified until registration and refresh complete.",
+    "GitHub branch and metadata readback remain required after the first push before publication is considered verified."
   ]
 }

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "A local-first, region-aware pixel-art underpainting workbench and CLI.",
+  "license": "MIT",
   "bin": {
     "pixel-workbench": "dist-cli/index.js"
   },

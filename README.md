@@ -69,4 +69,4 @@ pnpm build
 
 `main` is the deployable lane and `dev` is the integration lane. The browser interface and CLI both import the same TypeScript processing core. Output formats, algorithms, or workflow changes must update tests, documentation, and `.agents/change-surface-matrix.json` together.
 
-The repository is currently local-only. Remote publication and licensing are deliberate owner decisions and are not implied by the code being present locally.
+The source is published at [github.com/jakyeamos/pixel-art-workbench](https://github.com/jakyeamos/pixel-art-workbench) under the [MIT License](LICENSE).

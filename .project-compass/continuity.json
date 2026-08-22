@@ -26,8 +26,19 @@
       "statement": "Input images remain local; there is no upload, account, analytics, or remote inference path.",
       "status": "active",
       "source": { "ref": "PRODUCT.md", "observed_at": "2026-08-22T00:00:00Z" }
+    },
+    {
+      "id": "public-mit-release",
+      "kind": "decision",
+      "statement": "Publish Pixel Art Workbench publicly on GitHub under the MIT License.",
+      "status": "active",
+      "source": {
+        "ref": "current-user-authorization",
+        "note": "The repository owner selected public visibility and MIT licensing.",
+        "observed_at": "2026-08-22T20:15:00Z"
+      }
     }
   ],
   "reconciliations": [],
-  "updated_at": "2026-08-22T00:00:00Z"
+  "updated_at": "2026-08-22T20:15:00Z"
 }
