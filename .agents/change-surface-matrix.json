@@ -1,0 +1,81 @@
+{
+  "schema_version": "change-surface-matrix/v1",
+  "subject": { "kind": "repository", "id": "pixel-art-workbench" },
+  "owner": "repository-owner",
+  "last_reviewed": "2026-08-22",
+  "surfaces": [
+    {
+      "id": "matrix-maintenance",
+      "scope": "local",
+      "path": ".agents/change-surface-matrix.json",
+      "owner": "repository-owner",
+      "condition": "A material algorithm, input, output, workflow, privacy boundary, command, UI, or integration changes.",
+      "operations": ["add", "change", "remove"],
+      "validation": [
+        "Update affected types, tests, documentation, browser behavior, and CLI behavior together."
+      ],
+      "status": "applicable"
+    },
+    {
+      "id": "image-core",
+      "scope": "local",
+      "path": "src/core, tests/process.test.ts, docs/ARCHITECTURE.md, and docs/PRD.md",
+      "owner": "repository-owner",
+      "condition": "Resizing, palette, dithering, edge, region, transparency, cleanup, metrics, or recipe semantics change.",
+      "operations": ["add", "change", "remove"],
+      "validation": [
+        "pnpm test:coverage",
+        "pnpm typecheck",
+        "determinism and palette-bound review"
+      ],
+      "status": "applicable"
+    },
+    {
+      "id": "browser-workbench",
+      "scope": "local",
+      "path": "src/App.tsx, src/workbench, src/styles.css, and e2e",
+      "owner": "repository-owner",
+      "condition": "Import, preview, tracing, diagnostics, export, accessibility, responsive, or local-processing behavior changes.",
+      "operations": ["add", "change", "remove"],
+      "validation": [
+        "pnpm lint",
+        "pnpm typecheck",
+        "pnpm test:e2e",
+        "external Chrome visual and interaction check"
+      ],
+      "status": "applicable"
+    },
+    {
+      "id": "cli-and-aseprite",
+      "scope": "cross-surface",
+      "path": "src/cli, package.json, README.md, and tests/cli.test.ts",
+      "owner": "repository-owner",
+      "condition": "CLI flags, artifact names, manifest, palette file, Aseprite discovery, or layer handoff changes.",
+      "operations": ["add", "change", "remove"],
+      "validation": [
+        "pnpm test",
+        "pnpm build",
+        "CLI smoke bundle",
+        "Aseprite batch-mode smoke when installed"
+      ],
+      "status": "applicable"
+    },
+    {
+      "id": "human-contract",
+      "scope": "local",
+      "path": "README.md, PRODUCT.md, docs, and .agents/context/README.md",
+      "owner": "repository-owner",
+      "condition": "User-visible behavior, setup, limits, provenance, privacy, or workflow changes.",
+      "operations": ["add", "change", "remove"],
+      "validation": [
+        "Documentation review against live commands and browser behavior"
+      ],
+      "status": "applicable"
+    }
+  ],
+  "unresolved_surfaces": [
+    "No Git remote is configured, so remote hosting, push verification, and publication are unavailable until the repository owner selects a host and grants publication authority.",
+    "A live Pronto route check at 2026-08-22T20:06:41Z confirmed this repository is not registered; adding a discovery root is an owner-authorized persistent configuration change, so repository-catalog, Quality Runner import, and showcase projections remain unverified rather than inferred.",
+    "Licensing is intentionally undecided and must be selected before public distribution."
+  ]
+}

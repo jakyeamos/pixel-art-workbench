@@ -1,0 +1,104 @@
+{
+  "schema": "pronto-behavior-assurance/v2",
+  "applicability": "applicable",
+  "approved_producers": ["quality-runner"],
+  "behaviors": [
+    {
+      "id": "deterministic-underpainting",
+      "title": "Reference conversion is deterministic and bounded",
+      "tier": 0,
+      "automation": "permanent",
+      "change_triggers": ["src/core/**", "src/cli/**"],
+      "invariants": [
+        "Identical source pixels and validated options yield identical result pixels.",
+        "Transparent areas remain transparent and configured palette ceilings remain bounded.",
+        "Every artifact and manifest identifies the result as a reference underpainting."
+      ],
+      "scenarios": [
+        {
+          "id": "invalid-recipes-fail-closed",
+          "title": "Malformed recipes never reach image processing",
+          "oracle": "Out-of-range widths, palette counts, dithering, edge thresholds, cluster sizes, invalid region IDs, and malformed polygons are rejected at worker and CLI boundaries.",
+          "verification_level": "automated",
+          "edge_profile": {
+            "categories": ["input_and_encoding"],
+            "risk": "routine",
+            "side_effects": "none"
+          }
+        },
+        {
+          "id": "recipes-replay",
+          "title": "Browser recipes replay through the CLI",
+          "oracle": "A browser-exported project recipe can be parsed by the CLI and creates the documented artifact bundle with source hash, metrics, and palettes.",
+          "verification_level": "automated",
+          "edge_profile": {
+            "categories": ["environment_and_cross_surface"],
+            "risk": "routine",
+            "side_effects": "local_files"
+          }
+        }
+      ]
+    },
+    {
+      "id": "local-visual-workbench",
+      "title": "The browser workbench processes images locally",
+      "tier": 0,
+      "automation": "permanent",
+      "change_triggers": [
+        "src/App.tsx",
+        "src/workbench/**",
+        "src/styles.css",
+        "e2e/**"
+      ],
+      "invariants": [
+        "The application has no source-image upload endpoint or remote processing dependency.",
+        "Material regions, diagnostics, palette counts, and exports remain keyboard reachable.",
+        "The UI never presents an automated result as finished pixel art."
+      ],
+      "scenarios": [
+        {
+          "id": "local-image-converts",
+          "title": "A local image produces visible output and diagnostics",
+          "oracle": "After file selection, the workbench reports Ready, renders the underpainting and diagnostics, exposes exports, and displays the human-cleanup provenance warning.",
+          "verification_level": "direct_surface",
+          "edge_profile": {
+            "categories": [
+              "environment_and_cross_surface",
+              "input_and_encoding"
+            ],
+            "risk": "routine",
+            "side_effects": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "aseprite-handoff",
+      "title": "Aseprite handoff is explicit and non-destructive",
+      "tier": 1,
+      "automation": "on_demand",
+      "change_triggers": ["src/cli/aseprite.ts", "README.md"],
+      "invariants": [
+        "Aseprite is invoked only when --aseprite is present.",
+        "The handoff writes only inside the selected output directory and does not alter Aseprite preferences or install extensions.",
+        "The underpainting layer is visible and diagnostic layers are hidden."
+      ],
+      "scenarios": [
+        {
+          "id": "missing-aseprite-is-actionable",
+          "title": "A missing Aseprite binary fails with an exact repair path",
+          "oracle": "The CLI keeps the PNG/JSON bundle and reports that ASEPRITE_BIN or --aseprite-bin is required without claiming the .aseprite artifact exists.",
+          "verification_level": "automated",
+          "edge_profile": {
+            "categories": [
+              "environment_and_cross_surface",
+              "interruption_and_recovery"
+            ],
+            "risk": "routine",
+            "side_effects": "local_files"
+          }
+        }
+      ]
+    }
+  ]
+}

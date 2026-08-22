@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "revision": 2,
+  "project": {
+    "name": "Pixel Art Workbench",
+    "identity": "A local-first, region-aware pixel-art underpainting workbench and CLI.",
+    "audience": "Artists and developers converting visual references into controlled inputs for authored pixel work.",
+    "core_loop": "Import a reference, set structure and material budgets, inspect deterministic diagnostics, export a replayable bundle, and finish in Aseprite.",
+    "north_star": "Automated preparation saves repair time while the final pixels remain visibly authored.",
+    "not_this": [
+      "A one-click finished-art generator",
+      "A cloud image service",
+      "A replacement for Aseprite",
+      "An Editor's Desk-only script"
+    ]
+  },
+  "scope": {
+    "id": "pixel-art-workbench",
+    "kind": "root",
+    "parent_id": null,
+    "purpose": "Provide a reusable image-to-pixel production bridge with inspectable, reproducible output.",
+    "boundary": "The tool owns local preprocessing and export bundles; the artist owns final authorship and Aseprite owns editing.",
+    "non_goals": [
+      "Remote uploads",
+      "Accounts or telemetry",
+      "Generative synthesis",
+      "Claims of production-ready automated art"
+    ],
+    "parent_outcomes": [],
+    "paths": ["src", "tests", "e2e", "docs"]
+  },
+  "targets": {
+    "mvp": {
+      "definition": "A tested browser workbench and CLI sharing one deterministic core, with region control, diagnostics, replayable exports, and Aseprite handoff."
+    },
+    "complete_product": {
+      "definition": "The MVP validated across several real art cleanup sessions, with any recurring manual work promoted into bounded tools."
+    }
+  },
+  "pillars": [
+    {
+      "id": "deterministic-preparation",
+      "name": "Deterministic preparation",
+      "outcomes": [
+        {
+          "id": "replayable-underpainting",
+          "name": "A source and recipe produce an inspectable, replayable underpainting bundle.",
+          "targets": ["mvp", "complete_product"],
+          "maturity": 75,
+          "confidence": "high",
+          "layers": {
+            "intended": "The user requested a standalone tool that provides value beyond one website.",
+            "planned": "PRODUCT.md and docs/PRD.md define the underpainting boundary and acceptance criteria.",
+            "implemented": "Shared processing core, browser worker, CLI exports, and Aseprite handoff are present.",
+            "verified": "Formatting, typecheck, lint, unit coverage, dead-code analysis, production build, external-Chrome desktop/mobile interaction, CLI export, and installed-Aseprite layer handoff pass. Repeated real cleanup sessions remain future complete-product evidence."
+          },
+          "evidence": [
+            { "ref": "PRODUCT.md", "observed_at": "2026-08-22T00:00:00Z" },
+            {
+              "ref": "pnpm test:coverage",
+              "note": "7 tests passed; 94.69 percent statements and 97.26 percent lines",
+              "observed_at": "2026-08-22T20:01:38Z"
+            },
+            {
+              "ref": "pnpm test:e2e",
+              "note": "External Chrome desktop and mobile workbench acceptance passed",
+              "observed_at": "2026-08-22T20:01:38Z"
+            },
+            {
+              "ref": "Aseprite 1.3.18.2 batch smoke",
+              "note": "Generated project reopened with underpainting and two diagnostic layers",
+              "observed_at": "2026-08-22T20:01:38Z"
+            }
+          ],
+          "blockers": [
+            {
+              "kind": "complete-product-evidence",
+              "summary": "Several real human cleanup sessions are still required to validate repair-time savings and identify recurring manual operations."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "source_layers": {
+    "intended": [
+      {
+        "ref": "current-user-request",
+        "note": "Build the workflow tools as a separate reusable repository.",
+        "observed_at": "2026-08-22T00:00:00Z"
+      }
+    ],
+    "planned": [
+      { "ref": "docs/PRD.md", "observed_at": "2026-08-22T00:00:00Z" }
+    ],
+    "implemented": [{ "ref": "src", "observed_at": "2026-08-22T00:00:00Z" }],
+    "verified": [
+      {
+        "ref": "full local validation gate",
+        "note": "Format, types, lint, coverage, dead code, build, external Chrome, CLI, and Aseprite handoff passed",
+        "observed_at": "2026-08-22T20:01:38Z"
+      }
+    ]
+  },
+  "drift": [],
+  "updated_at": "2026-08-22T20:01:38Z"
+}

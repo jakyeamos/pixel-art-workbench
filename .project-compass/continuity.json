@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "revision": 1,
+  "commitments": [
+    {
+      "id": "standalone-product",
+      "kind": "decision",
+      "statement": "Pixel Art Workbench is an external reusable tool in its own repository, not an Editor's Desk subsystem.",
+      "status": "active",
+      "source": {
+        "ref": "current-user-request",
+        "note": "Explicit repository-boundary correction",
+        "observed_at": "2026-08-22T00:00:00Z"
+      }
+    },
+    {
+      "id": "underpainting-provenance",
+      "kind": "constraint",
+      "statement": "Automated output is always identified as a reference underpainting that requires human pixel authorship.",
+      "status": "active",
+      "source": { "ref": "PRODUCT.md", "observed_at": "2026-08-22T00:00:00Z" }
+    },
+    {
+      "id": "local-custody",
+      "kind": "constraint",
+      "statement": "Input images remain local; there is no upload, account, analytics, or remote inference path.",
+      "status": "active",
+      "source": { "ref": "PRODUCT.md", "observed_at": "2026-08-22T00:00:00Z" }
+    }
+  ],
+  "reconciliations": [],
+  "updated_at": "2026-08-22T00:00:00Z"
+}

@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "coveragePaths": ["coverage/lcov.info", "coverage/coverage-final.json"],
+  "coverageFormat": "auto",
+  "surfaces": {
+    "covered": ["src/core"],
+    "ignored": [
+      ".agents/change-surface-matrix.json",
+      ".agents/context/README.md",
+      ".project-compass/checkpoints.jsonl",
+      ".project-compass/continuity.json",
+      ".project-compass/contract.json",
+      ".pronto/behavior-assurance.json",
+      ".pre-cr.json",
+      "README.md",
+      "PRODUCT.md",
+      "docs",
+      "e2e",
+      "eslint.config.js",
+      "index.html",
+      "knip.json",
+      "package.json",
+      "playwright.config.ts",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "src/App.tsx",
+      "src/cli",
+      "src/main.tsx",
+      "src/styles.css",
+      "src/workbench",
+      "tests",
+      "tsconfig.json",
+      "vite.config.ts",
+      "vitest.config.ts"
+    ],
+    "unsupported": []
+  },
+  "threshold": 80,
+  "checks": { "coverage": true, "security": true, "checklist": true },
+  "testCommand": "pnpm test:coverage"
+}
