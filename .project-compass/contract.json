@@ -64,7 +64,7 @@
             {
               "ref": "pnpm test:e2e",
               "note": "External Chrome desktop and mobile cutout, undo, diagnostics, and canonical-export acceptance passed",
-              "observed_at": "2026-08-22T22:17:35Z"
+              "observed_at": "2026-08-22T22:30:30Z"
             },
             {
               "ref": "Aseprite 1.3.18.2 batch smoke",
@@ -103,10 +103,10 @@
       {
         "ref": "full local validation gate",
         "note": "Format, types, lint, 14-test coverage, dead code, build, external Chrome cutout and export flow, CLI conversion and resize, and Aseprite handoff passed",
-        "observed_at": "2026-08-22T22:17:35Z"
+        "observed_at": "2026-08-22T22:30:30Z"
       }
     ]
   },
   "drift": [],
-  "updated_at": "2026-08-22T22:17:35Z"
+  "updated_at": "2026-08-22T22:30:30Z"
 }
