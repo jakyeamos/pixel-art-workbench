@@ -13,9 +13,25 @@ test("converts a local reference and exposes diagnostics", async ({
       width: 32,
       height: 24,
       channels: 4,
-      background: { r: 126, g: 70, b: 36, alpha: 1 },
+      background: { r: 240, g: 232, b: 212, alpha: 1 },
     },
   })
+    .composite([
+      {
+        input: await sharp({
+          create: {
+            width: 16,
+            height: 14,
+            channels: 4,
+            background: { r: 126, g: 70, b: 36, alpha: 1 },
+          },
+        })
+          .png()
+          .toBuffer(),
+        left: 8,
+        top: 5,
+      },
+    ])
     .png()
     .toBuffer();
   await page.locator(".upload input[type=file]").setInputFiles({
@@ -31,6 +47,20 @@ test("converts a local reference and exposes diagnostics", async ({
   await expect(
     page.getByRole("button", { name: "Download underpainting" }),
   ).toBeEnabled();
+  await expect(
+    page.getByRole("button", { name: "Download 2× nearest-neighbor PNG" }),
+  ).toBeEnabled();
+
+  await page.getByRole("button", { name: "Pick background" }).click();
+  await expect(page.getByLabel("Cutout preview")).toBeVisible();
+  await page.locator("svg.region-overlay").click({ position: { x: 5, y: 5 } });
+  await expect(page.locator(".masthead .status")).toContainText(
+    "Connected background removed",
+  );
+  await expect(page.getByRole("button", { name: "Undo" })).toBeEnabled();
+  await page.keyboard.press("Control+z");
+  await expect(page.getByRole("button", { name: "Redo" })).toBeEnabled();
+
   await page.screenshot({
     path: testInfo.outputPath("workbench-desktop.png"),
     fullPage: true,
