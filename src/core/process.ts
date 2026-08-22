@@ -364,11 +364,17 @@ export function processRaster(
     options.regions,
   );
   const edgeMap = createEdgeMap(resized);
-  const globalPalette = extractPalette(
-    resized,
-    options.maxColors,
-    (index) => (regionMap[index] ?? 0) === 0,
+  const lockedPalette = options.lockedPalette.map((hex) =>
+    Number.parseInt(hex.slice(1), 16),
   );
+  const globalPalette =
+    lockedPalette.length > 0
+      ? lockedPalette
+      : extractPalette(
+          resized,
+          options.maxColors,
+          (index) => (regionMap[index] ?? 0) === 0,
+        );
   const runtimes: RegionRuntime[] = [
     { region: null, palette: globalPalette, dither: options.dither },
   ];
@@ -376,11 +382,14 @@ export function processRaster(
   for (let index = 0; index < options.regions.length; index += 1) {
     const region = options.regions[index];
     if (!region) continue;
-    const palette = extractPalette(
-      resized,
-      region.maxColors,
-      (pixel) => (regionMap[pixel] ?? 0) === index + 1,
-    );
+    const palette =
+      lockedPalette.length > 0
+        ? lockedPalette
+        : extractPalette(
+            resized,
+            region.maxColors,
+            (pixel) => (regionMap[pixel] ?? 0) === index + 1,
+          );
     runtimes.push({ region, palette, dither: region.dither });
   }
   const quantized = quantize(

@@ -20,8 +20,29 @@ describe("CLI", () => {
         "0.25",
       ]),
     ).toMatchObject({
+      command: "convert",
       input: "input.png",
       overrides: { targetWidth: 128, maxColors: 16, dither: 0.25 },
+    });
+  });
+
+  it("parses the canonical integer resizer separately from conversion", () => {
+    expect(
+      parseArguments([
+        "resize",
+        "sprite.png",
+        "--scales",
+        "2,4",
+        "--trim",
+        "--padding",
+        "2",
+      ]),
+    ).toMatchObject({
+      command: "resize",
+      input: "sprite.png",
+      scales: [1, 2, 4],
+      trim: true,
+      padding: 2,
     });
   });
 
@@ -54,5 +75,46 @@ describe("CLI", () => {
     await expect(
       readFile(join(output, "palette.gpl"), "utf8"),
     ).resolves.toContain("GIMP Palette");
+  });
+
+  it("writes exact nearest-neighbor scales and an asset manifest", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "pixel-resizer-test-"));
+    const input = join(directory, "sprite.png");
+    const output = join(directory, "scales");
+    await sharp({
+      create: {
+        width: 3,
+        height: 2,
+        channels: 4,
+        background: { r: 15, g: 25, b: 35, alpha: 1 },
+      },
+    })
+      .png()
+      .toFile(input);
+    await run(["resize", input, "--out", output, "--scales", "2,4"]);
+    await expect(
+      sharp(join(output, "asset-1x.png")).metadata(),
+    ).resolves.toMatchObject({
+      width: 3,
+      height: 2,
+    });
+    await expect(
+      sharp(join(output, "asset-4x.png")).metadata(),
+    ).resolves.toMatchObject({
+      width: 12,
+      height: 8,
+    });
+    const manifest = JSON.parse(
+      await readFile(join(output, "asset.json"), "utf8"),
+    ) as {
+      readonly scaling: string;
+      readonly artifacts: Record<string, string>;
+    };
+    expect(manifest.scaling).toBe("integer-nearest-neighbor");
+    expect(manifest.artifacts).toEqual({
+      "1x": "asset-1x.png",
+      "2x": "asset-2x.png",
+      "4x": "asset-4x.png",
+    });
   });
 });

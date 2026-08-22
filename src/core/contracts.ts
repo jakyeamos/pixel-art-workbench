@@ -19,11 +19,18 @@ export const processOptionsSchema = z.object({
   dither: z.number().min(0).max(1),
   edgeThreshold: z.number().min(0).max(1),
   minClusterSize: z.number().int().min(1).max(32),
+  lockedPalette: z
+    .array(z.string().regex(/^#[0-9a-fA-F]{6}$/))
+    .max(256)
+    .refine((colors) => colors.length === 0 || colors.length >= 2, {
+      message: "A locked palette must be empty or contain at least two colors.",
+    })
+    .default([]),
   regions: z.array(materialRegionSchema).max(32),
 });
 
 export const projectConfigSchema = z.object({
-  schema: z.literal("pixel-workbench-project/v1"),
+  schema: z.enum(["pixel-workbench-project/v1", "pixel-workbench-project/v2"]),
   source: z.string().min(1),
   options: processOptionsSchema,
 });

@@ -4,6 +4,12 @@ export interface Raster {
   readonly data: Uint8ClampedArray;
 }
 
+export interface AlphaMask {
+  readonly width: number;
+  readonly height: number;
+  readonly data: Uint8ClampedArray;
+}
+
 export interface Point {
   readonly x: number;
   readonly y: number;
@@ -23,6 +29,7 @@ export interface ProcessOptions {
   readonly dither: number;
   readonly edgeThreshold: number;
   readonly minClusterSize: number;
+  readonly lockedPalette: readonly string[];
   readonly regions: readonly MaterialRegion[];
 }
 
@@ -56,5 +63,6 @@ export const DEFAULT_OPTIONS: ProcessOptions = {
   dither: 0,
   edgeThreshold: 0.2,
   minClusterSize: 2,
+  lockedPalette: [],
   regions: [],
 };
