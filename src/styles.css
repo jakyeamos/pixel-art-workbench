@@ -31,11 +31,13 @@ body {
   background-size: 8px 8px;
 }
 button,
-input {
+input,
+select {
   font: inherit;
 }
 button,
-label.upload {
+label.upload,
+.mini-upload {
   border: 1px solid var(--line);
   border-radius: 0;
   color: var(--paper);
@@ -48,12 +50,14 @@ button {
   cursor: pointer;
 }
 button:hover:not(:disabled),
-label.upload:hover {
+label.upload:hover,
+.mini-upload:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 button:focus-visible,
 input:focus-visible,
+select:focus-visible,
 label.upload:focus-within {
   outline: 2px solid var(--cyan);
   outline-offset: 2px;
@@ -96,6 +100,32 @@ main {
   color: var(--paper-muted);
   font-size: 0.78rem;
   text-align: right;
+}
+.workflow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+.workflow span {
+  padding: 8px 10px;
+  color: #887760;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  background: #17110f;
+}
+.workflow span.complete {
+  color: var(--paper-muted);
+}
+.workflow span.active,
+.workflow span.ready {
+  color: #17110f;
+  background: var(--accent);
+}
+.workflow span.ready {
+  background: var(--cyan);
 }
 .workspace {
   display: grid;
@@ -165,13 +195,48 @@ input[type="range"] {
   accent-color: var(--accent);
 }
 input[type="number"],
-.region > input {
+.region > input,
+select {
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 0;
   padding: 7px;
   color: var(--paper);
   background: #17110f;
+}
+select {
+  max-width: 150px;
+}
+.tool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+.tool-grid button,
+.mini-upload {
+  min-height: 32px;
+  padding: 7px;
+  font-size: 0.64rem;
+}
+button[aria-pressed="true"] {
+  border-color: var(--cyan);
+  color: #17110f;
+  background: var(--cyan);
+}
+.mini-upload {
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.mini-upload input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.palette-upload {
+  grid-template-columns: 1fr;
+  color: var(--accent);
 }
 .section-heading {
   display: flex;
@@ -265,6 +330,18 @@ input[type="number"],
   max-width: 100%;
   max-height: calc(100vh - 190px);
   box-shadow: 8px 8px 0 #090706;
+  background-color: #211815;
+  background-image:
+    linear-gradient(45deg, #30231e 25%, transparent 25%),
+    linear-gradient(-45deg, #30231e 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #30231e 75%),
+    linear-gradient(-45deg, transparent 75%, #30231e 75%);
+  background-position:
+    0 0,
+    0 5px,
+    5px -5px,
+    -5px 0;
+  background-size: 10px 10px;
 }
 .raster-canvas {
   display: block;
@@ -273,7 +350,23 @@ input[type="number"],
   height: 100%;
   max-height: calc(100vh - 190px);
   image-rendering: pixelated;
-  background: #0d0a09;
+  background: transparent;
+}
+.canvas-shell.cutout-active {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+.stage-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin-top: 13px;
+  color: var(--paper-muted);
+  font-size: 0.68rem;
+}
+.stage-caption strong {
+  color: var(--paper);
 }
 .region-overlay {
   position: absolute;
@@ -304,6 +397,7 @@ input[type="number"],
 .region-overlay.is-drawing {
   pointer-events: auto;
   cursor: crosshair;
+  touch-action: none;
 }
 .metrics {
   display: flex;
@@ -355,6 +449,22 @@ input[type="number"],
   display: grid;
   gap: 8px;
 }
+.export-settings {
+  margin: 14px 0;
+  padding-top: 12px;
+}
+.scale-note {
+  margin: 16px 0 0;
+  padding: 11px;
+  border: 1px dashed var(--line);
+  color: var(--paper-muted);
+  font-size: 0.66rem;
+  line-height: 1.5;
+}
+.scale-note strong,
+.scale-note code {
+  color: var(--cyan);
+}
 .provenance {
   margin-top: 18px;
   padding: 12px;
@@ -399,6 +509,9 @@ input[type="number"],
   .workspace {
     display: flex;
     flex-direction: column;
+  }
+  .workflow {
+    grid-template-columns: 1fr 1fr;
   }
   .controls,
   .inspection {
