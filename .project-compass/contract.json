@@ -46,7 +46,7 @@
           "id": "replayable-underpainting",
           "name": "A source and recipe produce an inspectable, replayable underpainting bundle.",
           "targets": ["mvp", "complete_product"],
-          "maturity": 88,
+          "maturity": 75,
           "confidence": "high",
           "layers": {
             "intended": "The user requested a standalone tool that provides value beyond one website.",
@@ -79,7 +79,7 @@
           ],
           "blockers": [
             {
-              "kind": "complete-product-evidence",
+              "kind": "verification",
               "summary": "Several real human cleanup sessions are still required to validate repair-time savings and identify recurring manual operations."
             }
           ]
