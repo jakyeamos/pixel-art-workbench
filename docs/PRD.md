@@ -18,7 +18,7 @@ Make high-detail reference-to-pixel workflows faster without hiding the artistic
 - Connected-component cleanup for isolated same-color clusters.
 - Live browser preview and diagnostics in a worker.
 - Shared CLI implementation with PNG, GPL palette, JSON recipe, and optional Aseprite exports.
-- Dedicated CLI resizer that emits exact 1x–16x nearest-neighbor scale sets and a machine-readable asset manifest.
+- Dedicated CLI resizer that emits exact 1x–16x raw-RGBA replicated scale sets and a machine-readable asset manifest, including lossless handling of partially transparent edges.
 
 ## Acceptance
 

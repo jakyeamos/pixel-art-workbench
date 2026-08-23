@@ -81,13 +81,11 @@ describe("CLI", () => {
     const directory = await mkdtemp(join(tmpdir(), "pixel-resizer-test-"));
     const input = join(directory, "sprite.png");
     const output = join(directory, "scales");
-    await sharp({
-      create: {
-        width: 3,
-        height: 2,
-        channels: 4,
-        background: { r: 15, g: 25, b: 35, alpha: 1 },
-      },
+    const pixels = Buffer.from([
+      15, 25, 35, 255, 91, 123, 177, 73, 201, 88, 44, 149, 0, 0, 0, 0,
+    ]);
+    await sharp(pixels, {
+      raw: { width: 2, height: 2, channels: 4 },
     })
       .png()
       .toFile(input);
@@ -95,15 +93,25 @@ describe("CLI", () => {
     await expect(
       sharp(join(output, "asset-1x.png")).metadata(),
     ).resolves.toMatchObject({
-      width: 3,
+      width: 2,
       height: 2,
     });
     await expect(
       sharp(join(output, "asset-4x.png")).metadata(),
     ).resolves.toMatchObject({
-      width: 12,
+      width: 8,
       height: 8,
     });
+    const scaled = await sharp(join(output, "asset-2x.png")).raw().toBuffer();
+    for (let y = 0; y < 4; y += 1) {
+      for (let x = 0; x < 4; x += 1) {
+        const source = (Math.floor(y / 2) * 2 + Math.floor(x / 2)) * 4;
+        const destination = (y * 4 + x) * 4;
+        expect([...scaled.subarray(destination, destination + 4)]).toEqual([
+          ...pixels.subarray(source, source + 4),
+        ]);
+      }
+    }
     const manifest = JSON.parse(
       await readFile(join(output, "asset.json"), "utf8"),
     ) as {

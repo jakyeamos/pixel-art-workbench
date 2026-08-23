@@ -13,6 +13,7 @@ import {
   maskDiagnostic,
   maskFromRaster,
   parsePaletteText,
+  scaleNearest,
   trimTransparent,
 } from "../core/assets";
 import { projectConfigSchema, processOptionsSchema } from "../core/contracts";
@@ -259,12 +260,9 @@ async function writeRaster(
   raster: Raster,
   scale = 1,
 ): Promise<void> {
-  let pipeline = raw(raster);
-  if (scale > 1)
-    pipeline = pipeline.resize(raster.width * scale, raster.height * scale, {
-      kernel: "nearest",
-    });
-  await pipeline.png({ compressionLevel: 9 }).toFile(path);
+  await raw(scaleNearest(raster, scale))
+    .png({ compressionLevel: 9 })
+    .toFile(path);
 }
 
 function paletteFile(colors: readonly { readonly hex: string }[]): string {
