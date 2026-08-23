@@ -7,6 +7,8 @@ import type {
   Point,
   ProcessOptions,
   Raster,
+  SceneNativeSize,
+  SceneSizing,
 } from "../core/types";
 
 export type CutoutTool = "off" | "erase" | "restore" | "sample";
@@ -34,6 +36,10 @@ interface WorkbenchControlsProps {
   readonly resultExists: boolean;
   readonly options: ProcessOptions;
   readonly setOptions: Dispatch<SetStateAction<ProcessOptions>>;
+  readonly sceneSizing: SceneSizing | null;
+  readonly setSceneSizing: Dispatch<SetStateAction<SceneSizing | null>>;
+  readonly defaultSceneSizing: SceneSizing;
+  readonly sceneNativeSize: SceneNativeSize | null;
   readonly cutoutTool: CutoutTool;
   readonly setCutoutTool: Dispatch<SetStateAction<CutoutTool>>;
   readonly brushRadius: number;
@@ -66,6 +72,10 @@ export function WorkbenchControls({
   resultExists,
   options,
   setOptions,
+  sceneSizing,
+  setSceneSizing,
+  defaultSceneSizing,
+  sceneNativeSize,
   cutoutTool,
   setCutoutTool,
   brushRadius,
@@ -200,6 +210,97 @@ export function WorkbenchControls({
 
       <fieldset disabled={!source}>
         <legend>Asset profile</legend>
+        <label className="scene-sizing-toggle">
+          <input
+            type="checkbox"
+            checked={Boolean(sceneSizing)}
+            onChange={(event) =>
+              setSceneSizing(
+                event.currentTarget.checked ? defaultSceneSizing : null,
+              )
+            }
+          />
+          Match an existing scene grid
+        </label>
+        {sceneSizing ? (
+          <div className="scene-sizing-fields">
+            <p className="hint">
+              Retarget this asset into the same logical pixel density as its
+              scene.
+            </p>
+            <div className="dimension-pair">
+              <label>
+                Render width
+                <input
+                  type="number"
+                  min="1"
+                  max="16384"
+                  value={sceneSizing.renderWidth}
+                  onChange={(event) =>
+                    setSceneSizing((current) =>
+                      current
+                        ? { ...current, renderWidth: numeric(event) }
+                        : current,
+                    )
+                  }
+                />
+              </label>
+              <label>
+                Render height
+                <input
+                  type="number"
+                  min="1"
+                  max="16384"
+                  value={sceneSizing.renderHeight}
+                  onChange={(event) =>
+                    setSceneSizing((current) =>
+                      current
+                        ? { ...current, renderHeight: numeric(event) }
+                        : current,
+                    )
+                  }
+                />
+              </label>
+              <label>
+                Logical width
+                <input
+                  type="number"
+                  min="1"
+                  max="4096"
+                  value={sceneSizing.logicalWidth}
+                  onChange={(event) =>
+                    setSceneSizing((current) =>
+                      current
+                        ? { ...current, logicalWidth: numeric(event) }
+                        : current,
+                    )
+                  }
+                />
+              </label>
+              <label>
+                Logical height
+                <input
+                  type="number"
+                  min="1"
+                  max="4096"
+                  value={sceneSizing.logicalHeight}
+                  onChange={(event) =>
+                    setSceneSizing((current) =>
+                      current
+                        ? { ...current, logicalHeight: numeric(event) }
+                        : current,
+                    )
+                  }
+                />
+              </label>
+            </div>
+            <p className="scene-sizing-result" role="status">
+              {sceneNativeSize
+                ? `Scene-native draft: ${sceneNativeSize.width}×${sceneNativeSize.height}px · ${sceneNativeSize.densityX.toFixed(2)} render pixels per logical pixel`
+                : "Scene dimensions must describe the same pixel density on both axes."}
+            </p>
+          </div>
+        ) : null}
         <label>
           Purpose
           <select
@@ -231,6 +332,7 @@ export function WorkbenchControls({
             max="960"
             step="8"
             value={options.targetWidth}
+            disabled={Boolean(sceneSizing)}
             onChange={(event) =>
               setOptions((current) => ({
                 ...current,

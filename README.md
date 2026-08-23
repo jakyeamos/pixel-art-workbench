@@ -18,7 +18,7 @@ pnpm dev
 Open `http://127.0.0.1:4173`, drop in a PNG, JPEG, or WebP, then:
 
 1. Pick a connected background color, paint with erase/restore, or import an existing alpha mask. Undo and redo retain up to 20 cutout checkpoints within a 64 MB memory budget.
-2. Choose an icon, small-prop, desk-prop, portrait, or scene profile, then tune its logical width and cleanup budget.
+2. Choose an icon, small-prop, desk-prop, portrait, or scene profile, then tune its logical width and cleanup budget. When the asset must join an existing pixel scene, enable **Match an existing scene grid** and enter the rendered and logical scene dimensions; the workbench calculates the asset's scene-native detail box.
 3. Extract colors from the reference or import a GPL/text palette to lock an entire asset family to the same colors.
 4. Trace material regions when paper, wood, brass, ceramic, light, or another surface needs its own palette and dither budget.
 5. Export the trimmed canonical underpainting, alpha mask, diagnostics, palette, and replayable recipe.
@@ -50,6 +50,14 @@ Apply an alpha/grayscale mask, lock a shared palette, and export several integer
 pnpm cli -- cat.jpg --mask cat-mask.png --palette office.gpl --width 96 --scales 1,2,3,4 --padding 2 --out cat-underpainting
 ```
 
+Retarget a high-density sprite into the exact logical grid used by an existing scene:
+
+```sh
+pnpm cli -- figurine.png --scene-render 1671x941 --scene-logical 640x360 --no-trim --scales 1,2,3,4 --out figurine-desk-native
+```
+
+Both scene dimensions are required together and cannot be combined with `--width`. The two axes must imply nearly the same pixel density. The recipe records the source scene, logical scene, resolved asset box, and both density values so a density mismatch cannot remain implicit.
+
 After the human cleanup pass, derive lossless display scales from one canonical sprite:
 
 ```sh
@@ -68,7 +76,7 @@ The CLI looks for `ASEPRITE_BIN`, an `aseprite` executable on `PATH`, then `/App
 - `diagnostic-edges.png` — pixels protected from error diffusion and cleanup.
 - `diagnostic-cleanup.png` — color clusters changed by cleanup.
 - `palette.gpl` — GIMP/Aseprite-compatible palette.
-- `project.json` — source hash, exact options, metrics, palettes, and artifact map.
+- `project.json` — source hash, exact options, metrics, palettes, artifact map, and optional scene-grid derivation.
 - `underpainting.aseprite` — optional layered Aseprite handoff.
 - `asset-Nx.png` and `asset.json` — canonical scale set produced by the `resize` command.
 

@@ -25,12 +25,27 @@ export interface MaterialRegion {
 
 export interface ProcessOptions {
   readonly targetWidth: number;
+  readonly targetHeight?: number | undefined;
   readonly maxColors: number;
   readonly dither: number;
   readonly edgeThreshold: number;
   readonly minClusterSize: number;
   readonly lockedPalette: readonly string[];
   readonly regions: readonly MaterialRegion[];
+}
+
+export interface SceneSizing {
+  readonly renderWidth: number;
+  readonly renderHeight: number;
+  readonly logicalWidth: number;
+  readonly logicalHeight: number;
+}
+
+export interface SceneNativeSize {
+  readonly width: number;
+  readonly height: number;
+  readonly densityX: number;
+  readonly densityY: number;
 }
 
 export interface PaletteColor {

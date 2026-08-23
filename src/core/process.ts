@@ -21,14 +21,24 @@ function assertRaster(raster: Raster): void {
     throw new Error("Raster data length does not match its dimensions.");
 }
 
-export function resizeArea(source: Raster, targetWidth: number): Raster {
+export function resizeArea(
+  source: Raster,
+  targetWidth: number,
+  targetHeight?: number,
+): Raster {
   assertRaster(source);
   if (!Number.isInteger(targetWidth) || targetWidth < 1)
     throw new Error("Target width must be a positive integer.");
+  if (
+    targetHeight !== undefined &&
+    (!Number.isInteger(targetHeight) || targetHeight < 1)
+  )
+    throw new Error("Target height must be a positive integer.");
   const width = Math.min(targetWidth, source.width);
-  const height = Math.max(
-    1,
-    Math.round((source.height * width) / source.width),
+  const height = Math.min(
+    source.height,
+    targetHeight ??
+      Math.max(1, Math.round((source.height * width) / source.width)),
   );
   if (width === source.width && height === source.height)
     return { width, height, data: new Uint8ClampedArray(source.data) };
@@ -357,7 +367,7 @@ export function processRaster(
   options: ProcessOptions,
 ): ProcessResult {
   assertRaster(source);
-  const resized = resizeArea(source, options.targetWidth);
+  const resized = resizeArea(source, options.targetWidth, options.targetHeight);
   const regionMap = buildRegionMap(
     resized.width,
     resized.height,

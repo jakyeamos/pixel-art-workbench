@@ -212,6 +212,41 @@ select {
   grid-template-columns: 1fr 1fr;
   gap: 7px;
 }
+
+.scene-sizing-toggle {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 0.55rem;
+}
+
+.scene-sizing-toggle input {
+  width: auto;
+}
+
+.scene-sizing-fields {
+  border-left: 3px solid var(--accent);
+  display: grid;
+  gap: 0.65rem;
+  padding-left: 0.8rem;
+}
+
+.dimension-pair {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dimension-pair input {
+  width: 100%;
+}
+
+.scene-sizing-result {
+  color: var(--paper);
+  font-size: 0.82rem;
+  line-height: 1.35;
+  margin: 0;
+}
 .tool-grid button,
 .mini-upload {
   min-height: 32px;

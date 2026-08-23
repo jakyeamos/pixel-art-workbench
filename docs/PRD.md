@@ -10,6 +10,7 @@ Make high-detail reference-to-pixel workflows faster without hiding the artistic
 - Editable alpha cutouts with connected-background sampling, erase/restore brushes, mask import, invert/reset, and bounded undo/redo.
 - Transparent-bound trimming and configurable canonical padding.
 - Deterministic area downsampling to a selected logical width.
+- Scene-native target derivation from paired rendered-scene and logical-scene dimensions, including exact small-asset width and height.
 - Median-cut-style palette extraction with a bounded ceiling.
 - GPL/text palette import and asset-family palette locking.
 - Sobel edge detection that blocks dithering and cleanup across significant edges.
@@ -28,6 +29,7 @@ Make high-detail reference-to-pixel workflows faster without hiding the artistic
 - Transparent source areas remain transparent.
 - Mask edits never alter source RGB pixels and connected-background removal does not cross a rejected color boundary.
 - Integer exports contain exact repeated canonical pixels with no interpolation.
+- Scene-native exports reject conflicting axis densities and record their resolved detail box in the replayable recipe.
 - Invalid ranges and malformed polygons fail at the external boundary.
 - The browser visibly completes a local conversion and exposes all diagnostic/export surfaces.
 - CLI output records source provenance, recipe, metrics, and artifact names.

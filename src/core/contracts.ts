@@ -14,7 +14,8 @@ const materialRegionSchema = z.object({
 });
 
 export const processOptionsSchema = z.object({
-  targetWidth: z.number().int().min(16).max(2048),
+  targetWidth: z.number().int().min(1).max(2048),
+  targetHeight: z.number().int().min(1).max(2048).optional(),
   maxColors: z.number().int().min(2).max(256),
   dither: z.number().min(0).max(1),
   edgeThreshold: z.number().min(0).max(1),
@@ -29,8 +30,20 @@ export const processOptionsSchema = z.object({
   regions: z.array(materialRegionSchema).max(32),
 });
 
+export const sceneSizingSchema = z.object({
+  renderWidth: z.number().int().min(1).max(16_384),
+  renderHeight: z.number().int().min(1).max(16_384),
+  logicalWidth: z.number().int().min(1).max(4096),
+  logicalHeight: z.number().int().min(1).max(4096),
+});
+
 export const projectConfigSchema = z.object({
-  schema: z.enum(["pixel-workbench-project/v1", "pixel-workbench-project/v2"]),
+  schema: z.enum([
+    "pixel-workbench-project/v1",
+    "pixel-workbench-project/v2",
+    "pixel-workbench-project/v3",
+  ]),
   source: z.string().min(1),
   options: processOptionsSchema,
+  sceneSizing: sceneSizingSchema.optional(),
 });

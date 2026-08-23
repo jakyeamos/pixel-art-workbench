@@ -51,6 +51,15 @@ test("converts a local reference and exposes diagnostics", async ({
     page.getByRole("button", { name: "Download 2× nearest-neighbor PNG" }),
   ).toBeEnabled();
 
+  await page.getByLabel("Match an existing scene grid").check();
+  await expect(page.getByText(/Scene-native draft: 12×9px/)).toBeVisible();
+  await expect(page.locator(".masthead .status")).toContainText("12×9", {
+    timeout: 10_000,
+  });
+  await expect(
+    page.getByRole("slider", { name: /Logical width/ }),
+  ).toBeDisabled();
+
   await page.getByRole("button", { name: "Pick background" }).click();
   await expect(page.getByLabel("Cutout preview")).toBeVisible();
   await page.locator("svg.region-overlay").click({ position: { x: 5, y: 5 } });

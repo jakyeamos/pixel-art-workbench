@@ -16,12 +16,18 @@ import {
   scaleNearest,
   trimTransparent,
 } from "../core/assets";
-import { projectConfigSchema, processOptionsSchema } from "../core/contracts";
+import {
+  projectConfigSchema,
+  processOptionsSchema,
+  sceneSizingSchema,
+} from "../core/contracts";
 import { processRaster } from "../core/process";
+import { deriveSceneNativeSize } from "../core/sceneSizing";
 import {
   DEFAULT_OPTIONS,
   type ProcessOptions,
   type Raster,
+  type SceneSizing,
 } from "../core/types";
 import { createAsepriteBundle } from "./aseprite";
 
@@ -40,6 +46,7 @@ interface ConvertArguments extends SharedArguments {
   readonly palette?: string;
   readonly aseprite: boolean;
   readonly asepriteBin?: string;
+  readonly sceneSizing?: SceneSizing;
   readonly overrides: Partial<
     Pick<
       ProcessOptions,
@@ -72,6 +79,8 @@ Conversion options:
   --mask <image>          Apply a grayscale or alpha cutout mask
   --palette <file>        Lock colors from a GPL or #RRGGBB text palette
   --width <pixels>        Logical output width
+  --scene-render <WxH>    Existing rendered scene dimensions
+  --scene-logical <WxH>   Authored logical scene dimensions
   --colors <count>        Extracted palette ceiling
   --dither <0..1>         Edge-guarded Floyd-Steinberg strength
   --edge <0..1>           Edge-lock threshold
@@ -89,6 +98,28 @@ Shared asset options:
 
 Conversion outputs remain reference underpaintings. Human pixel cleanup is still required.
 Integer scaling preserves pixels but never creates a new detail level.`;
+}
+
+function dimensionsValue(
+  name: string,
+  value: string | undefined,
+): {
+  readonly width: number;
+  readonly height: number;
+} {
+  if (!value) throw new Error(`${name} requires WIDTHxHEIGHT.`);
+  const match = /^(\d+)x(\d+)$/i.exec(value);
+  if (!match) throw new Error(`${name} must use WIDTHxHEIGHT.`);
+  const width = Number(match[1]);
+  const height = Number(match[2]);
+  if (
+    !Number.isInteger(width) ||
+    !Number.isInteger(height) ||
+    width < 1 ||
+    height < 1
+  )
+    throw new Error(`${name} dimensions must be positive integers.`);
+  return { width, height };
 }
 
 function numberValue(name: string, value: string | undefined): number {
@@ -111,9 +142,10 @@ function scalesValue(value: string | undefined): readonly number[] {
 }
 
 export function parseArguments(argv: readonly string[]): CliArguments | null {
-  if (argv.includes("--help") || argv.includes("-h")) return null;
-  const command = argv[0] === "resize" ? "resize" : "convert";
-  const values = command === "resize" ? argv.slice(1) : argv;
+  const normalized = argv[0] === "--" ? argv.slice(1) : argv;
+  if (normalized.includes("--help") || normalized.includes("-h")) return null;
+  const command = normalized[0] === "resize" ? "resize" : "convert";
+  const values = command === "resize" ? normalized.slice(1) : normalized;
   let input: string | undefined;
   let outputDirectory =
     command === "resize" ? "pixel-asset-scales" : "pixel-workbench-output";
@@ -122,6 +154,12 @@ export function parseArguments(argv: readonly string[]): CliArguments | null {
   let palette: string | undefined;
   let aseprite = false;
   let asepriteBin: string | undefined;
+  let sceneRender:
+    | { readonly width: number; readonly height: number }
+    | undefined;
+  let sceneLogical:
+    | { readonly width: number; readonly height: number }
+    | undefined;
   let scales: readonly number[] = command === "resize" ? [1, 2, 3, 4] : [1, 2];
   let trim = command === "convert";
   let padding = command === "convert" ? 1 : 0;
@@ -172,6 +210,15 @@ export function parseArguments(argv: readonly string[]): CliArguments | null {
         if (argument === "--palette") palette = value;
         if (argument === "--aseprite-bin") asepriteBin = value;
         break;
+      case "--scene-render":
+      case "--scene-logical": {
+        if (command === "resize")
+          throw new Error(`${argument} is only available during conversion.`);
+        const dimensions = dimensionsValue(argument, value);
+        if (argument === "--scene-render") sceneRender = dimensions;
+        else sceneLogical = dimensions;
+        break;
+      }
       case "--width":
       case "--colors":
       case "--dither":
@@ -194,6 +241,12 @@ export function parseArguments(argv: readonly string[]): CliArguments | null {
     }
   }
   if (!input) throw new Error("An input image is required.");
+  if (Boolean(sceneRender) !== Boolean(sceneLogical))
+    throw new Error(
+      "--scene-render and --scene-logical must be supplied together.",
+    );
+  if (sceneRender && sceneLogical && overrides.targetWidth !== undefined)
+    throw new Error("--width cannot be combined with scene-native sizing.");
   const shared = { input, outputDirectory, scales, trim, padding } as const;
   if (command === "resize") return { command, ...shared };
   return {
@@ -204,19 +257,33 @@ export function parseArguments(argv: readonly string[]): CliArguments | null {
     ...(palette ? { palette } : {}),
     aseprite,
     ...(asepriteBin ? { asepriteBin } : {}),
+    ...(sceneRender && sceneLogical
+      ? {
+          sceneSizing: sceneSizingSchema.parse({
+            renderWidth: sceneRender.width,
+            renderHeight: sceneRender.height,
+            logicalWidth: sceneLogical.width,
+            logicalHeight: sceneLogical.height,
+          }),
+        }
+      : {}),
     overrides,
   };
 }
 
-async function readOptions(
-  arguments_: ConvertArguments,
-): Promise<ProcessOptions> {
+async function readConfiguration(arguments_: ConvertArguments): Promise<{
+  readonly options: ProcessOptions;
+  readonly sceneSizing?: SceneSizing;
+}> {
   let options = DEFAULT_OPTIONS;
+  let sceneSizing = arguments_.sceneSizing;
   if (arguments_.config) {
     const parsed = projectConfigSchema.parse(
       JSON.parse(await readFile(resolve(arguments_.config), "utf8")),
     );
     options = parsed.options;
+    if (!sceneSizing && arguments_.overrides.targetWidth === undefined)
+      sceneSizing = parsed.sceneSizing;
   }
   if (arguments_.palette) {
     const colors = parsePaletteText(
@@ -226,7 +293,14 @@ async function readOptions(
       throw new Error("Palette files need at least two RGB colors.");
     options = { ...options, lockedPalette: colors };
   }
-  return processOptionsSchema.parse({ ...options, ...arguments_.overrides });
+  const parsedOptions = processOptionsSchema.parse({
+    ...options,
+    ...arguments_.overrides,
+  });
+  return {
+    options: parsedOptions,
+    ...(sceneSizing ? { sceneSizing } : {}),
+  };
 }
 
 async function readRaster(
@@ -328,7 +402,7 @@ async function runResize(arguments_: ResizeArguments): Promise<void> {
 async function runConvert(arguments_: ConvertArguments): Promise<void> {
   const inputPath = resolve(arguments_.input);
   const outputDirectory = resolve(arguments_.outputDirectory);
-  const options = await readOptions(arguments_);
+  const configuration = await readConfiguration(arguments_);
   const { raster, source } = await readRaster(inputPath);
   let prepared = raster;
   let maskRaster: Raster | undefined;
@@ -339,6 +413,19 @@ async function runConvert(arguments_: ConvertArguments): Promise<void> {
     maskRaster = maskDiagnostic(mask);
   }
   if (arguments_.trim) prepared = trimTransparent(prepared);
+  const sceneNative = configuration.sceneSizing
+    ? deriveSceneNativeSize(
+        prepared.width,
+        prepared.height,
+        configuration.sceneSizing,
+      )
+    : undefined;
+  const options = processOptionsSchema.parse({
+    ...configuration.options,
+    ...(sceneNative
+      ? { targetWidth: sceneNative.width, targetHeight: sceneNative.height }
+      : {}),
+  });
   const result = processRaster(prepared, options);
   const canonical = arguments_.trim
     ? trimTransparent(result.underpainting, arguments_.padding)
@@ -379,12 +466,23 @@ async function runConvert(arguments_: ConvertArguments): Promise<void> {
       : []),
   ]);
   const manifest = {
-    schema: "pixel-workbench-project/v2",
+    schema: "pixel-workbench-project/v3",
     provenance: "reference-underpainting",
     generator: { name: "pixel-art-workbench", version: "0.2.0" },
     source: basename(inputPath),
     sourceSha256: createHash("sha256").update(source).digest("hex"),
     options,
+    ...(configuration.sceneSizing && sceneNative
+      ? {
+          sceneSizing: {
+            ...configuration.sceneSizing,
+            resolvedWidth: sceneNative.width,
+            resolvedHeight: sceneNative.height,
+            densityX: sceneNative.densityX,
+            densityY: sceneNative.densityY,
+          },
+        }
+      : {}),
     asset: {
       canonicalWidth: canonical.width,
       canonicalHeight: canonical.height,

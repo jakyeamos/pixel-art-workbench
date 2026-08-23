@@ -13,6 +13,7 @@ import {
 } from "../src/core/assets";
 import { processOptionsSchema } from "../src/core/contracts";
 import { buildRegionMap, processRaster, resizeArea } from "../src/core/process";
+import { deriveSceneNativeSize } from "../src/core/sceneSizing";
 import type { Raster } from "../src/core/types";
 import { DEFAULT_OPTIONS } from "../src/core/types";
 
@@ -55,6 +56,44 @@ describe("pixel processing core", () => {
     expect(result.height).toBe(1);
     expect(result.data[0]).toBe(255);
     expect(result.data[3]).toBeCloseTo(64, 0);
+  });
+
+  it("area-downsamples to an exact scene-native box", () => {
+    const source = raster(72, 202, () => [110, 45, 38, 255]);
+    const result = resizeArea(source, 28, 77);
+    expect([result.width, result.height]).toEqual([28, 77]);
+  });
+
+  it("derives desk-native figurine sizes from the office render grid", () => {
+    const scene = {
+      renderWidth: 1671,
+      renderHeight: 941,
+      logicalWidth: 640,
+      logicalHeight: 360,
+    } as const;
+    expect(deriveSceneNativeSize(72, 202, scene)).toMatchObject({
+      width: 28,
+      height: 77,
+    });
+    expect(deriveSceneNativeSize(44, 145, scene)).toMatchObject({
+      width: 17,
+      height: 55,
+    });
+    expect(deriveSceneNativeSize(80, 164, scene)).toMatchObject({
+      width: 31,
+      height: 63,
+    });
+  });
+
+  it("rejects scene grids whose axes imply different pixel densities", () => {
+    expect(() =>
+      deriveSceneNativeSize(72, 202, {
+        renderWidth: 1600,
+        renderHeight: 900,
+        logicalWidth: 640,
+        logicalHeight: 400,
+      }),
+    ).toThrow(/density/i);
   });
 
   it("rasterizes normalized material polygons", () => {

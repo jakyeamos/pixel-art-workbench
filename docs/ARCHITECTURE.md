@@ -2,7 +2,7 @@
 
 ## Shared core
 
-`src/core` owns all deterministic image behavior and has no React, DOM, Sharp, or Aseprite dependency. `assets.ts` owns masks, connected-background clearing, transparent trimming, palette parsing, and nearest-neighbor scaling. The processing core accepts raw RGBA rasters plus a validated recipe and returns the underpainting, diagnostics, palettes, and metrics.
+`src/core` owns all deterministic image behavior and has no React, DOM, Sharp, or Aseprite dependency. `assets.ts` owns masks, connected-background clearing, transparent trimming, palette parsing, and nearest-neighbor scaling. `sceneSizing.ts` converts a sprite's rendered dimensions into the logical grid of an existing scene and rejects materially inconsistent horizontal/vertical densities. The processing core accepts raw RGBA rasters plus a validated recipe and returns the underpainting, diagnostics, palettes, and metrics.
 
 ## Browser workbench
 
@@ -20,16 +20,19 @@
 
 1. Apply the alpha mask without changing source RGB values.
 2. Trim transparent source bounds when asset mode is enabled.
-3. Premultiplied-alpha area downsample.
-4. Normalize polygons into a per-pixel material map.
-5. Compute the luminance edge map.
-6. Use the locked family palette or extract global and material palettes.
-7. Quantize with edge-guarded error diffusion.
-8. Replace sub-threshold connected clusters unless protected by edge strength.
-9. Generate diagnostics and color counts.
-10. Trim and pad the canonical underpainting, then create only requested integer display scales by exact raw RGBA pixel replication.
+3. Resolve either the direct logical width or the exact scene-native width and height.
+4. Premultiplied-alpha area downsample.
+5. Normalize polygons into a per-pixel material map.
+6. Compute the luminance edge map.
+7. Use the locked family palette or extract global and material palettes.
+8. Quantize with edge-guarded error diffusion.
+9. Replace sub-threshold connected clusters unless protected by edge strength.
+10. Generate diagnostics and color counts.
+11. Trim and pad the canonical underpainting, then create only requested integer display scales by exact raw RGBA pixel replication.
 
-This order is part of the replay contract. Algorithm changes require a schema or generator-version review because old recipes may produce different pixels.
+Scene-native sizing is a retargeting operation, not display scaling. It uses the rendered scene dimensions and the scene's authored logical dimensions to calculate a deterministic target box for the sprite. Exact width and height are retained because independent rounding at small prop sizes is more faithful to the scene projection than silently choosing one axis and drifting on the other.
+
+This order is part of the replay contract. Schema `pixel-workbench-project/v3` adds optional scene-sizing metadata and an exact target height while continuing to accept v1 and v2 recipes. Algorithm changes require a schema or generator-version review because old recipes may produce different pixels.
 
 ## Automatic cutout adapters
 

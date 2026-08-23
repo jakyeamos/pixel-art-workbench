@@ -10,6 +10,7 @@ import {
   trimTransparent,
 } from "./core/assets";
 import { resizeArea } from "./core/process";
+import { deriveSceneNativeSize } from "./core/sceneSizing";
 import type {
   AlphaMask,
   MaterialRegion,
@@ -17,6 +18,8 @@ import type {
   ProcessOptions,
   ProcessResult,
   Raster,
+  SceneNativeSize,
+  SceneSizing,
 } from "./core/types";
 import { DEFAULT_OPTIONS } from "./core/types";
 import { downloadBlob, fileToRaster, rasterToBlob } from "./workbench/image";
@@ -36,6 +39,12 @@ interface WorkerResponse {
 
 const MAX_MASK_HISTORY_ENTRIES = 20;
 const MAX_MASK_HISTORY_BYTES = 64 * 1024 * 1024;
+const DEFAULT_SCENE_SIZING: SceneSizing = {
+  renderWidth: 1671,
+  renderHeight: 941,
+  logicalWidth: 640,
+  logicalHeight: 360,
+};
 
 function appendMaskSnapshot(
   history: readonly AlphaMask[],
@@ -86,6 +95,7 @@ export default function App(): React.JSX.Element {
   const [mask, setMask] = useState<AlphaMask | null>(null);
   const [sourceName, setSourceName] = useState("untitled.png");
   const [options, setOptions] = useState<ProcessOptions>(DEFAULT_OPTIONS);
+  const [sceneSizing, setSceneSizing] = useState<SceneSizing | null>(null);
   const [result, setResult] = useState<ProcessResult | null>(null);
   const [status, setStatus] = useState("Drop in a reference image to begin.");
   const [draft, setDraft] = useState<readonly Point[]>([]);
@@ -110,6 +120,31 @@ export default function App(): React.JSX.Element {
     if (!source || !mask) return null;
     return trimTransparent(applyAlphaMask(source, mask));
   }, [mask, source]);
+
+  const sceneNativeSize = useMemo<SceneNativeSize | null>(() => {
+    if (!preparedSource || !sceneSizing) return null;
+    try {
+      return deriveSceneNativeSize(
+        preparedSource.width,
+        preparedSource.height,
+        sceneSizing,
+      );
+    } catch {
+      return null;
+    }
+  }, [preparedSource, sceneSizing]);
+
+  const effectiveOptions = useMemo<ProcessOptions>(
+    () =>
+      sceneNativeSize
+        ? {
+            ...options,
+            targetWidth: sceneNativeSize.width,
+            targetHeight: sceneNativeSize.height,
+          }
+        : options,
+    [options, sceneNativeSize],
+  );
 
   const cutoutPreview = useMemo(() => {
     if (!source || !mask) return null;
@@ -149,11 +184,11 @@ export default function App(): React.JSX.Element {
       worker.current?.postMessage({
         id: request.current,
         source: preparedSource,
-        options,
+        options: effectiveOptions,
       });
     }, 180);
     return () => window.clearTimeout(timeout);
-  }, [options, preparedSource]);
+  }, [effectiveOptions, preparedSource]);
 
   const handleFile = useCallback(async (file: File): Promise<void> => {
     setStatus("Reading source…");
@@ -385,10 +420,21 @@ export default function App(): React.JSX.Element {
   const downloadProject = (): void => {
     if (!result || !canonicalAsset) return;
     const payload = {
-      schema: "pixel-workbench-project/v2",
+      schema: "pixel-workbench-project/v3",
       provenance: "reference-underpainting",
       source: sourceName,
-      options,
+      options: effectiveOptions,
+      ...(sceneSizing && sceneNativeSize
+        ? {
+            sceneSizing: {
+              ...sceneSizing,
+              resolvedWidth: sceneNativeSize.width,
+              resolvedHeight: sceneNativeSize.height,
+              densityX: sceneNativeSize.densityX,
+              densityY: sceneNativeSize.densityY,
+            },
+          }
+        : {}),
       asset: {
         canonicalWidth: canonicalAsset.width,
         canonicalHeight: canonicalAsset.height,
@@ -443,6 +489,10 @@ export default function App(): React.JSX.Element {
           resultExists={Boolean(result)}
           options={options}
           setOptions={setOptions}
+          sceneSizing={sceneSizing}
+          setSceneSizing={setSceneSizing}
+          defaultSceneSizing={DEFAULT_SCENE_SIZING}
+          sceneNativeSize={sceneNativeSize}
           cutoutTool={cutoutTool}
           setCutoutTool={setCutoutTool}
           brushRadius={brushRadius}
@@ -469,7 +519,7 @@ export default function App(): React.JSX.Element {
           drawingRegion={drawingRegion}
           draft={draft}
           regionPolygon={regionPolygon}
-          options={options}
+          options={effectiveOptions}
           result={result}
           handleFile={handleFile}
           onPointerDown={handleStagePointerDown}
@@ -480,7 +530,7 @@ export default function App(): React.JSX.Element {
           result={result}
           canonicalAsset={canonicalAsset}
           mask={mask}
-          options={options}
+          options={effectiveOptions}
           assetPadding={assetPadding}
           setAssetPadding={setAssetPadding}
           exportScale={exportScale}

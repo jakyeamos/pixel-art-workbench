@@ -8,6 +8,13 @@ import { describe, expect, it } from "vitest";
 import { parseArguments, run } from "../src/cli/index";
 
 describe("CLI", () => {
+  it("accepts pnpm's conventional argument separator", () => {
+    expect(parseArguments(["--", "input.png"])).toMatchObject({
+      command: "convert",
+      input: "input.png",
+    });
+  });
+
   it("parses explicit conversion options", () => {
     expect(
       parseArguments([
@@ -24,6 +31,37 @@ describe("CLI", () => {
       input: "input.png",
       overrides: { targetWidth: 128, maxColors: 16, dither: 0.25 },
     });
+  });
+
+  it("parses scene-native sizing separately from a direct width", () => {
+    expect(
+      parseArguments([
+        "sprite.png",
+        "--scene-render",
+        "1671x941",
+        "--scene-logical",
+        "640x360",
+      ]),
+    ).toMatchObject({
+      command: "convert",
+      sceneSizing: {
+        renderWidth: 1671,
+        renderHeight: 941,
+        logicalWidth: 640,
+        logicalHeight: 360,
+      },
+    });
+    expect(() =>
+      parseArguments([
+        "sprite.png",
+        "--width",
+        "32",
+        "--scene-render",
+        "1671x941",
+        "--scene-logical",
+        "640x360",
+      ]),
+    ).toThrow(/cannot be combined/i);
   });
 
   it("parses the canonical integer resizer separately from conversion", () => {
@@ -75,6 +113,51 @@ describe("CLI", () => {
     await expect(
       readFile(join(output, "palette.gpl"), "utf8"),
     ).resolves.toContain("GIMP Palette");
+  });
+
+  it("writes an exact scene-native retarget with replayable density metadata", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "pixel-scene-grid-test-"));
+    const input = join(directory, "figurine.png");
+    const output = join(directory, "output");
+    await sharp({
+      create: {
+        width: 72,
+        height: 202,
+        channels: 4,
+        background: { r: 100, g: 42, b: 39, alpha: 1 },
+      },
+    })
+      .png()
+      .toFile(input);
+    await run([
+      input,
+      "--out",
+      output,
+      "--scene-render",
+      "1671x941",
+      "--scene-logical",
+      "640x360",
+      "--no-trim",
+      "--colors",
+      "8",
+    ]);
+    await expect(
+      sharp(join(output, "underpainting.png")).metadata(),
+    ).resolves.toMatchObject({ width: 28, height: 77 });
+    const manifest = JSON.parse(
+      await readFile(join(output, "project.json"), "utf8"),
+    ) as {
+      readonly schema: string;
+      readonly sceneSizing: {
+        readonly resolvedWidth: number;
+        readonly resolvedHeight: number;
+      };
+    };
+    expect(manifest.schema).toBe("pixel-workbench-project/v3");
+    expect(manifest.sceneSizing).toMatchObject({
+      resolvedWidth: 28,
+      resolvedHeight: 77,
+    });
   });
 
   it("writes exact nearest-neighbor scales and an asset manifest", async () => {

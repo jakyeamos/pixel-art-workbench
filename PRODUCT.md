@@ -10,7 +10,7 @@ An artist or developer who begins from photography, generated concept art, or a 
 
 ## Core loop
 
-Import a reference, remove or mask its background, choose an asset profile, constrain or lock its palette, protect meaningful edges, assign material regions, inspect cleanup diagnostics, export a reproducible bundle, finish the artwork in Aseprite, and derive integer display scales from the authored canonical sprite.
+Import a reference, remove or mask its background, choose an asset profile or derive a target from an existing scene grid, constrain or lock its palette, protect meaningful edges, assign material regions, inspect cleanup diagnostics, export a reproducible bundle, finish the artwork in Aseprite, and derive integer display scales from the authored canonical sprite.
 
 ## Product promises
 
@@ -22,6 +22,7 @@ Import a reference, remove or mask its background, choose an asset profile, cons
 - Diagnostics reveal protected edges and automated cluster changes.
 - Every export records that it is a reference underpainting, not finished art.
 - Integer nearest-neighbor exports preserve every canonical RGBA value, including partial alpha, and explicitly do not claim to create new detail.
+- Scene-native retargeting maps an asset from rendered scene coordinates into the scene's logical pixel grid and records the resolved density and dimensions.
 - Aseprite integration uses files and its documented command surface rather than automating its visible UI.
 
 ## Non-goals
