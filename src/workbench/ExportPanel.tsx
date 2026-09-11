@@ -82,9 +82,10 @@ export function ExportPanel({
           </p>
           <fieldset className="export-settings">
             <legend>Canonical export</legend>
-            <label>
+            <label htmlFor="workbench-transparent-padding">
               Transparent padding <output>{assetPadding}px</output>
               <input
+                id="workbench-transparent-padding"
                 type="range"
                 min="0"
                 max="16"
@@ -93,9 +94,10 @@ export function ExportPanel({
                 onChange={(event) => setAssetPadding(numeric(event))}
               />
             </label>
-            <label>
+            <label htmlFor="workbench-integer-scale">
               Integer scale <output>{exportScale}×</output>
               <input
+                id="workbench-integer-scale"
                 type="range"
                 min="1"
                 max="8"

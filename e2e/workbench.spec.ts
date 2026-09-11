@@ -51,6 +51,22 @@ test("converts a local reference and exposes diagnostics", async ({
     page.getByRole("button", { name: "Download 2× nearest-neighbor PNG" }),
   ).toBeEnabled();
 
+  for (const name of [
+    "Brush size",
+    "Background tolerance",
+    "Logical width",
+    "Palette ceiling",
+    "Dither",
+    "Edge lock",
+    "Minimum cluster",
+    "Transparent padding",
+    "Integer scale",
+  ]) {
+    await expect(
+      page.getByRole("slider", { name: new RegExp(`^${name}`) }),
+    ).toBeVisible();
+  }
+
   await page.getByLabel("Match an existing scene grid").check();
   await expect(page.getByText(/Scene-native draft: 12×9px/)).toBeVisible();
   await expect(page.locator(".masthead .status")).toContainText("12×9", {

@@ -1,0 +1,28 @@
+{
+  "behaviors": [
+    {
+      "id": "deterministic-underpainting",
+      "spec_ref": ".pronto/behavior-assurance.json#/behaviors/0",
+      "title": "Reference conversion is deterministic and bounded",
+      "origin": "existing repository behavior assurance; preserved, not re-ratified"
+    },
+    {
+      "id": "local-visual-workbench",
+      "spec_ref": ".pronto/behavior-assurance.json#/behaviors/1",
+      "title": "The browser workbench processes images locally",
+      "origin": "existing repository behavior assurance; preserved, not re-ratified"
+    },
+    {
+      "id": "aseprite-handoff",
+      "spec_ref": ".pronto/behavior-assurance.json#/behaviors/2",
+      "title": "Aseprite handoff is explicit and non-destructive",
+      "origin": "existing repository behavior assurance; preserved, not re-ratified"
+    },
+    {
+      "id": "named-browser-sliders",
+      "spec_ref": ".agents/change-surface-matrix.json#/surfaces/2",
+      "title": "Browser sliders expose their visible labels and scene sizing disables manual width",
+      "origin": "Existing browser accessibility contract and workbench E2E; narrow source association, not full local visual behavior acceptance"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "schema": "compass-development/v1",
+  "revision": 1,
+  "inventory": {
+    "source": "git-tracked",
+    "include": ["**"],
+    "exclude": [],
+    "behavior_ref": ".project-compass/behaviors.json"
+  },
+  "bindings": [
+    {
+      "id": "assurance-deterministic-underpainting",
+      "compass_id": "project",
+      "authority": "accepted",
+      "paths": [
+        "src/cli/aseprite.ts",
+        "src/cli/index.ts",
+        "src/core/assets.ts",
+        "src/core/color.ts",
+        "src/core/contracts.ts",
+        "src/core/palette.ts",
+        "src/core/process.ts",
+        "src/core/sceneSizing.ts",
+        "src/core/types.ts",
+        "tests/process.test.ts",
+        "tests/cli.test.ts",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vitest.config.ts",
+        "tsconfig.json",
+        "PRODUCT.md",
+        "docs/PRD.md",
+        ".pronto/behavior-assurance.json",
+        ".project-compass/development.json",
+        ".project-compass/behaviors.json"
+      ],
+      "outcomes": ["replayable-underpainting"],
+      "references": [
+        ".pronto/behavior-assurance.json#/behaviors/0",
+        ".project-compass/contract.json",
+        "PRODUCT.md"
+      ],
+      "constraints": [
+        "Identical source pixels and validated options yield identical result pixels.",
+        "Transparent areas remain transparent and configured palette ceilings remain bounded.",
+        "Applying a mask changes only output alpha and never rewrites source RGB channels.",
+        "Locked palettes bound every processed material region to the selected asset family colors.",
+        "Every artifact and manifest identifies the result as a reference underpainting."
+      ],
+      "behavior_ids": ["deterministic-underpainting"],
+      "proof": [
+        {
+          "id": "test-process",
+          "receipt": ".project-compass/evidence/test-process.json",
+          "command": ["pnpm", "exec", "vitest", "run", "tests/process.test.ts"],
+          "oracle_ref": "tests/process.test.ts",
+          "behavior_ids": ["deterministic-underpainting"]
+        },
+        {
+          "id": "test-cli",
+          "receipt": ".project-compass/evidence/test-cli.json",
+          "command": ["pnpm", "exec", "vitest", "run", "tests/cli.test.ts"],
+          "oracle_ref": "tests/cli.test.ts",
+          "behavior_ids": ["deterministic-underpainting"]
+        }
+      ],
+      "decision_id": "canonical-product-core-source-association",
+      "handoff_review": "Reviewed existing PRODUCT and PRD conversion obligations and deterministic-underpainting assurance association only. process.test covers asserted deterministic pixels, transparency, masking, recipes and scene sizing; locked palette assertion is inclusion rather than exhaustive material palette ceiling proof. cli.test imports run and checks conversion/export metadata and exact partial-alpha scaling; it does not launch installed executable or Aseprite. aseprite.ts is included as imported CLI dependency, not proof of external handoff. Browser and Aseprite behavior IDs remain in inventory but unbound here; missing Aseprite oracle/runtime evidence remains explicit. Child organization remains proposed outside this bounded delivery. No fresh installed user workflow or artist quality acceptance."
+    },
+    {
+      "id": "assurance-named-browser-sliders",
+      "compass_id": "project",
+      "authority": "accepted",
+      "paths": [
+        "src/workbench/WorkbenchControls.tsx",
+        "src/workbench/ExportPanel.tsx",
+        "e2e/workbench.spec.ts",
+        "playwright.config.ts",
+        ".agents/change-surface-matrix.json"
+      ],
+      "dependencies": [
+        "index.html",
+        "package.json",
+        "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
+        "src/App.tsx",
+        "src/cli/aseprite.ts",
+        "src/cli/index.ts",
+        "src/core/assets.ts",
+        "src/core/color.ts",
+        "src/core/contracts.ts",
+        "src/core/palette.ts",
+        "src/core/process.ts",
+        "src/core/sceneSizing.ts",
+        "src/core/types.ts",
+        "src/main.tsx",
+        "src/styles.css",
+        "src/workbench/RasterCanvas.tsx",
+        "src/workbench/WorkbenchStage.tsx",
+        "src/workbench/image.ts",
+        "src/workbench/processor.worker.ts",
+        "tsconfig.json",
+        "vite.config.ts"
+      ],
+      "outcomes": ["replayable-underpainting"],
+      "references": [
+        ".agents/change-surface-matrix.json#/surfaces/2",
+        "README.md",
+        "e2e/workbench.spec.ts"
+      ],
+      "constraints": [
+        "Visible slider names remain programmatically associated with their controls.",
+        "Scene-grid sizing disables manual asset width without changing derived scene sizing.",
+        "Browser processing remains local; this fixture does not establish exhaustive network privacy assurance."
+      ],
+      "behavior_ids": ["named-browser-sliders"],
+      "proof": [
+        {
+          "id": "test-named-browser-sliders",
+          "receipt": ".project-compass/evidence/test-named-browser-sliders.json",
+          "command": [
+            "python3",
+            "-c",
+            "import pathlib,tempfile,socket,subprocess,json\nw=pathlib.Path.cwd()\nwith socket.socket() as s:\n s.bind(('127.0.0.1',0));port=s.getsockname()[1]\nwith tempfile.TemporaryDirectory(prefix='pixel-owned-browser-') as d:\n p=pathlib.Path(d)/'playwright.config.ts';url=f'http://127.0.0.1:{port}'\n p.write_text('import original from '+json.dumps(str(w/'playwright.config.ts'))+';\\nexport default {...original,testDir:'+json.dumps(str(w/'e2e'))+',outputDir:'+json.dumps(str(pathlib.Path(d)/'results'))+',use:{...original.use,baseURL:'+json.dumps(url)+'},webServer:{...original.webServer,command:'+json.dumps(f'pnpm dev --port {port} --strictPort')+',cwd:'+json.dumps(str(w))+',url:'+json.dumps(url)+',reuseExistingServer:false}};\\n')\n raise SystemExit(subprocess.run(['pnpm','exec','playwright','test','--config',str(p)]).returncode)\n"
+          ],
+          "oracle_ref": "e2e/workbench.spec.ts",
+          "behavior_ids": ["named-browser-sliders"]
+        }
+      ],
+      "decision_id": "canonical-browser-accessibility-association",
+      "handoff_review": "Existing browser-workbench accessibility contract grounds this narrow association. Nine output-before-range labels now explicitly target their range; unchanged existing scene-sizing assertion plus added name assertions exercise the repair. Bound disposable configuration uses exact source tests and a unique strict local port, never reusing a running server. Exact source runtime/config files invalidate proof as conservative dependencies, without granting ownership of those paths. Full local-visual-workbench and Aseprite behaviors remain unbound; no exhaustive privacy, real artist acceptance, default-port service or current Aseprite proof is claimed. Existing matrix obligations are retained; this repair fulfills its browser accessibility row without adding a product feature."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "canonical-product-core-source-association",
+      "summary": "Reviewed existing deterministic conversion source association with canonical PRODUCT and PRD under existing accepted root; browser and Aseprite scopes remain separately incomplete, no new child or maturity acceptance.",
+      "source": "PRODUCT.md",
+      "status": "accepted"
+    },
+    {
+      "id": "canonical-browser-accessibility-association",
+      "summary": "Source association of existing browser accessibility obligation and named-slider oracle under the accepted root; authorized required-gate label repair preserves processing behavior and broader gaps.",
+      "source": ".agents/change-surface-matrix.json#/surfaces/2",
+      "status": "accepted"
+    }
+  ]
+}

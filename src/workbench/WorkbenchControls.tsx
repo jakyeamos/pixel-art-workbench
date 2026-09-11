@@ -135,9 +135,10 @@ export function WorkbenchControls({
             Preview art
           </button>
         </div>
-        <label>
+        <label htmlFor="workbench-brush-size">
           Brush size <output>{Math.round(brushRadius * 100)}%</output>
           <input
+            id="workbench-brush-size"
             type="range"
             min="0.005"
             max="0.16"
@@ -146,10 +147,11 @@ export function WorkbenchControls({
             onChange={(event) => setBrushRadius(numeric(event))}
           />
         </label>
-        <label>
+        <label htmlFor="workbench-background-tolerance">
           Background tolerance{" "}
           <output>{Math.round(backgroundTolerance * 100)}%</output>
           <input
+            id="workbench-background-tolerance"
             type="range"
             min="0.01"
             max="0.5"
@@ -324,9 +326,10 @@ export function WorkbenchControls({
             ))}
           </select>
         </label>
-        <label>
+        <label htmlFor="workbench-logical-width">
           Logical width <output>{options.targetWidth}px</output>
           <input
+            id="workbench-logical-width"
             type="range"
             min="16"
             max="960"
@@ -341,9 +344,10 @@ export function WorkbenchControls({
             }
           />
         </label>
-        <label>
+        <label htmlFor="workbench-palette-ceiling">
           Palette ceiling <output>{options.maxColors}</output>
           <input
+            id="workbench-palette-ceiling"
             type="range"
             min="4"
             max="256"
@@ -358,9 +362,10 @@ export function WorkbenchControls({
             }
           />
         </label>
-        <label>
+        <label htmlFor="workbench-dither">
           Dither <output>{Math.round(options.dither * 100)}%</output>
           <input
+            id="workbench-dither"
             type="range"
             min="0"
             max="1"
@@ -374,9 +379,10 @@ export function WorkbenchControls({
             }
           />
         </label>
-        <label>
+        <label htmlFor="workbench-edge-lock">
           Edge lock <output>{Math.round(options.edgeThreshold * 100)}%</output>
           <input
+            id="workbench-edge-lock"
             type="range"
             min="0.05"
             max="0.8"
@@ -390,9 +396,10 @@ export function WorkbenchControls({
             }
           />
         </label>
-        <label>
+        <label htmlFor="workbench-minimum-cluster">
           Minimum cluster <output>{options.minClusterSize}px</output>
           <input
+            id="workbench-minimum-cluster"
             type="range"
             min="1"
             max="12"
